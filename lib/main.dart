@@ -10,11 +10,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = View.of(context).platformDispatcher.platformBrightness;
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.light().copyWith(
-          // change anything you want
-          ),
+      theme:
+          brightness == Brightness.light ? ThemeData.light() : ThemeData.dark(),
       home: const WeatherScreen(),
     );
   }

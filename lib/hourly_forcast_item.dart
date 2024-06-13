@@ -1,8 +1,9 @@
+import 'package:conversion_units/conversion_units.dart';
 import 'package:flutter/material.dart';
 
 class HourlyForcastCard extends StatelessWidget {
   final String time;
-  final String temparature;
+  final double temparature;
   final IconData icon;
 
   const HourlyForcastCard({
@@ -41,7 +42,7 @@ class HourlyForcastCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                temparature,
+                Kelvin.toCelsius(temparature).toStringAsFixed(2),
                 style: const TextStyle(
                   fontSize: 14,
                 ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:ui';
+import 'package:conversion_units/conversion_units.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -17,10 +18,11 @@ class WeatherScreen extends StatefulWidget {
 }
 
 class _WeatherScreenState extends State<WeatherScreen> {
+  late Future<Map<String, dynamic>> weather;
   Future<Map<String, dynamic>> getCurrentWeather() async {
     log('inside getWeather');
 
-    String cityName = 'London';
+    String cityName = 'Kishoreganj';
     final res = await http.get(
       Uri.parse(
           'https://api.openweathermap.org/data/2.5/forecast?q=$cityName&APPID=$openWeatherAPIKey'),
@@ -31,6 +33,12 @@ class _WeatherScreenState extends State<WeatherScreen> {
     }
     log('got data');
     return data;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    weather = getCurrentWeather();
   }
 
   @override
@@ -47,13 +55,15 @@ class _WeatherScreenState extends State<WeatherScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () => setState(() {}),
+            onPressed: () => setState(() {
+              weather = getCurrentWeather();
+            }),
             icon: const Icon(Icons.refresh),
           )
         ],
       ),
       body: FutureBuilder(
-        future: getCurrentWeather(),
+        future: weather,
         builder: (context, snapshot) {
           log('inside future builder');
           log(snapshot.toString());
@@ -98,7 +108,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                           child: Column(
                             children: [
                               Text(
-                                '$currentTemp K',
+                                '${Kelvin.toCelsius(currentTemp).toStringAsFixed(2)}° C',
                                 style: const TextStyle(
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,
@@ -147,8 +157,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                     itemCount: 6,
                     itemBuilder: (context, index) {
                       final hourlyForcast = data['list'][index + 1];
-                      final hourlyTemparature =
-                          hourlyForcast['main']['temp'].toString();
+                      final hourlyTemparature = hourlyForcast['main']['temp'];
                       final hourlySky = hourlyForcast['weather'][0]['main'];
                       final dateTime =
                           DateTime.parse(hourlyForcast['dt_txt'].toString());
